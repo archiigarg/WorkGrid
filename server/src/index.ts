@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
@@ -17,10 +17,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 /* ROUTES */
+import projectRoutes from "./routes/projectRoutes";
+import taskRoutes from "./routes/taskRoutes";
+
 
 app.get("/", (req, res) => {
   res.send("This is the home page!");
 });
+app.use("/projects", projectRoutes);
+app.use("/tasks", taskRoutes);
+
 
 /* SERVER */
 const port = Number(process.env.PORT) || 3000;
