@@ -46,12 +46,12 @@ const Timeline = () => {
     return <div>An error occurred while fetching projects</div>;
 
   return (
-    <div className="max-w-full p-8">
-      <header className="mb-4 flex items-center justify-between">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <header className="flex flex-col gap-4 rounded-3xl border border-white/70 bg-white/75 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70 md:flex-row md:items-center md:justify-between">
         <Header name="Projects Timeline" />
         <div className="relative inline-block w-64">
           <select
-            className="focus:shadow-outline block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white"
+            className="focus:shadow-outline block w-full appearance-none rounded-full border border-slate-200 bg-white px-4 py-2.5 pr-8 leading-tight shadow-sm outline-none transition hover:border-slate-300 focus:border-sky-300 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-sky-500/40"
             value={displayOptions.viewMode}
             onChange={handleViewModeChange}
           >
@@ -62,7 +62,7 @@ const Timeline = () => {
         </div>
       </header>
 
-      <div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary dark:text-white">
+      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-[0_18px_40px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-slate-900/80 dark:text-white">
         <div className="timeline">
           <Gantt
             tasks={ganttTasks}

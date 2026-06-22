@@ -40,7 +40,7 @@ const HomePage = () => {
     data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
-  } = useGetTasksQuery({ projectId: parseInt("1") });
+  } = useGetTasksQuery({ projectId: 1 });
   const { data: projects, isLoading: isProjectsLoading } =
     useGetProjectsQuery();
 
@@ -92,11 +92,17 @@ const HomePage = () => {
       };
 
   return (
-    <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
-      <Header name="Project Management Dashboard" />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
-          <h3 className="mb-4 text-lg font-semibold dark:text-white">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <div className="rounded-3xl border border-white/70 bg-white/75 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70 sm:p-8">
+        <Header name="Project Management Dashboard" />
+        <p className="max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+          A quick read on what is active, what is overdue, and where work is concentrated right now.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-slate-900/80">
+          <h3 className="mb-4 text-lg font-semibold text-slate-950 dark:text-white">
             Task Priority Distribution
           </h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -118,8 +124,8 @@ const HomePage = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
-          <h3 className="mb-4 text-lg font-semibold dark:text-white">
+        <div className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-slate-900/80">
+          <h3 className="mb-4 text-lg font-semibold text-slate-950 dark:text-white">
             Project Status
           </h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -137,8 +143,8 @@ const HomePage = () => {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
-          <h3 className="mb-4 text-lg font-semibold dark:text-white">
+        <div className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-slate-900/80 xl:col-span-2">
+          <h3 className="mb-4 text-lg font-semibold text-slate-950 dark:text-white">
             Your Tasks
           </h3>
           <div style={{ height: 400, width: "100%" }}>
