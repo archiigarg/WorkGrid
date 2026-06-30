@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
@@ -6,6 +6,8 @@ import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
 import { useGetAuthUserQuery } from "@/state/api";
 import { signOut } from "aws-amplify/auth";
 import Image from "next/image";
+import { debounce } from "lodash";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -13,8 +15,23 @@ const Navbar = () => {
     (state) => state.global.isSidebarCollapsed,
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
   const { data: currentUser } = useGetAuthUserQuery({});
+
+  const navigateToSearch = useMemo(
+    () =>
+      debounce((query: string) => {
+        const trimmedQuery = query.trim();
+        if (trimmedQuery.length >= 3) {
+          router.push(`/search?query=${encodeURIComponent(trimmedQuery)}`);
+        } else {
+          router.push("/search");
+        }
+      }, 400),
+    [router],
+  );
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -22,6 +39,12 @@ const Navbar = () => {
       console.error("Error signing out: ", error);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      navigateToSearch.cancel();
+    };
+  }, [navigateToSearch]);
 
   if (!currentUser) return null;
   const currentUserDetails = currentUser?.userDetails;
@@ -43,6 +66,17 @@ const Navbar = () => {
             className="w-full rounded border-none bg-gray-100 p-2 pl-8 placeholder-gray-500 focus:border-transparent focus:outline-none dark:bg-gray-700 dark:text-white dark:placeholder-white"
             type="search"
             placeholder="Search..."
+            value={searchTerm}
+            onChange={(event) => {
+              const value = event.target.value;
+              setSearchTerm(value);
+              navigateToSearch(value);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                navigateToSearch(searchTerm);
+              }
+            }}
           />
         </div>
       </div>

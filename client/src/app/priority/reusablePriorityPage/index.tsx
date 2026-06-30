@@ -8,8 +8,7 @@ import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 import {
   Priority,
   Task,
-  useGetAuthUserQuery,
-  useGetTasksByUserQuery,
+  useGetAllTasksQuery,
 } from "@/state/api";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import React, { useState } from "react";
@@ -63,13 +62,13 @@ const columns: GridColDef[] = [
     field: "author",
     headerName: "Author",
     width: 150,
-    renderCell: (params) => params.value.username || "Unknown",
+    renderCell: (params) => params.value?.username || "Unknown",
   },
   {
     field: "assignee",
     headerName: "Assignee",
     width: 150,
-    renderCell: (params) => params.value.username || "Unassigned",
+    renderCell: (params) => params.value?.username || "Unassigned",
   },
 ];
 
@@ -77,26 +76,21 @@ const ReusablePriorityPage = ({ priority }: Props) => {
   const [view, setView] = useState("list");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
-  const { data: currentUser } = useGetAuthUserQuery({});
-  const userId = currentUser?.userDetails?.userId ?? null;
   const {
     data: tasks,
     isLoading,
     isError: isTasksError,
-  } = useGetTasksByUserQuery(userId || 0, {
-    skip: userId === null,
-  });
+  } = useGetAllTasksQuery();
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-  const filteredTasks = tasks?.filter(
-    (task: Task) => task.priority === priority,
-  );
+  const filteredTasks = tasks?.filter((task: Task) => task.priority === priority) ?? [];
 
-  if (isTasksError || !tasks) return <div>Error fetching tasks</div>;
+  if (isLoading) return <div>Loading tasks...</div>;
+  if (isTasksError) return <div>Error fetching tasks</div>;
 
   return (
-    <div className="m-5 p-4">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
       <ModalNewTask
         isOpen={isModalNewTaskOpen}
         onClose={() => setIsModalNewTaskOpen(false)}
@@ -112,35 +106,34 @@ const ReusablePriorityPage = ({ priority }: Props) => {
           </button>
         }
       />
-      <div className="mb-4 flex justify-start">
+      <div className="flex justify-start gap-2">
         <button
-          className={`px-4 py-2 ${
+          className={`rounded-full px-4 py-2 text-sm font-medium transition ${
             view === "list" ? "bg-gray-300" : "bg-white"
-          } rounded-l`}
+          }`}
           onClick={() => setView("list")}
         >
           List
         </button>
         <button
-          className={`px-4 py-2 ${
+          className={`rounded-full px-4 py-2 text-sm font-medium transition ${
             view === "table" ? "bg-gray-300" : "bg-white"
-          } rounded-l`}
+          }`}
           onClick={() => setView("table")}
         >
           Table
         </button>
       </div>
-      {isLoading ? (
-        <div>Loading tasks...</div>
-      ) : view === "list" ? (
+      {view === "list" ? (
         <div className="grid grid-cols-1 gap-4">
-          {filteredTasks?.map((task: Task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
+          {filteredTasks.length > 0 ? (
+            filteredTasks.map((task: Task) => <TaskCard key={task.id} task={task} />)
+          ) : (
+            <div>No tasks found for this priority.</div>
+          )}
         </div>
       ) : (
-        view === "table" &&
-        filteredTasks && (
+        view === "table" && (
           <div className="z-0 w-full">
             <DataGrid
               rows={filteredTasks}

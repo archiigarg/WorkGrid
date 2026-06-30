@@ -6,10 +6,14 @@ import TaskCard from "@/components/TaskCard";
 import UserCard from "@/components/UserCard";
 import { useSearchQuery } from "@/state/api";
 import { debounce } from "lodash";
-import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
 
 const Search = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("query") ?? "";
+  const [searchTerm, setSearchTerm] = useState(initialQuery);
+  const [query, setQuery] = useState(initialQuery);
   const {
     data: searchResults,
     isLoading,
@@ -18,16 +22,24 @@ const Search = () => {
     skip: searchTerm.length < 3,
   });
 
-  const handleSearch = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchTerm(event.target.value);
-    },
-    500,
+  useEffect(() => {
+    setSearchTerm(initialQuery);
+    setQuery(initialQuery);
+  }, [initialQuery]);
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchTerm(value);
+      }, 500),
+    [],
   );
 
   useEffect(() => {
-    return handleSearch.cancel;
-  }, [handleSearch.cancel]);
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
@@ -43,7 +55,12 @@ const Search = () => {
           type="text"
           placeholder="Search..."
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-sky-300 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-sky-500/40 lg:w-1/2"
-          onChange={handleSearch}
+          value={query}
+          onChange={(event) => {
+            const value = event.target.value;
+            setQuery(value);
+            debouncedSearch(value);
+          }}
         />
       </div>
       <div className="space-y-6">
